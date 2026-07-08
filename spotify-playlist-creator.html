@@ -284,8 +284,16 @@ async function buildTracks(id, name) {
   document.getElementById('tracks-content').style.display = 'none';
   showStatus('tracks-status','<span class="spinner"></span> Cargando Top 10...','info');
 
-  const topData = await spotifyGet('/artists/' + id + '/top-tracks?market=ES');
-  const top10 = topData.tracks.slice(0,10).map(t => ({ uri:t.uri, name:t.name, artist:t.artists.map(a=>a.name).join(', '), src:'top' }));
+  let top10 = [];
+  for (const market of ['US','ES','AR','MX','GB']) {
+    try {
+      const topData = await spotifyGet('/artists/' + id + '/top-tracks?market=' + market);
+      if (topData.tracks && topData.tracks.length > 0) {
+        top10 = topData.tracks.slice(0,10).map(t => ({ uri:t.uri, name:t.name, artist:t.artists.map(a=>a.name).join(', '), src:'top' }));
+        break;
+      }
+    } catch(e) { console.warn('market ' + market + ' failed:', e); }
+  }
 
   showStatus('tracks-status','<span class="spinner"></span> Buscando "This Is ' + name + '"...','info');
   let thisIs = [];
