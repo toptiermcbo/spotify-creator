@@ -267,7 +267,9 @@ async function loadArtist() {
     const a = await spotifyGet('/artists/' + id);
     artistNameGlobal = a.name;
     document.getElementById('artist-name').textContent = a.name;
-    document.getElementById('artist-meta').textContent = (a.followers.total).toLocaleString('es') + ' seguidores · ' + (a.genres.slice(0,3).join(', ')||'sin géneros');
+    const followers = a.followers?.total != null ? a.followers.total.toLocaleString("es") + " seguidores" : "";
+    const genres = a.genres?.length ? a.genres.slice(0,3).join(", ") : "";
+    document.getElementById("artist-meta").textContent = [followers, genres].filter(Boolean).join(" · ");
     if (a.images?.length) document.getElementById('artist-img').src = a.images[0].url;
     document.getElementById('artist-preview').style.display = 'flex';
     document.getElementById('pl-name').value = 'Lo mejor de ' + a.name;
